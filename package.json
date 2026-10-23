@@ -1,0 +1,76 @@
+{
+  "name": "@loggerai/browser",
+  "version": "0.1.0",
+  "description": "LoggerAI for web apps: session recording, errors and user reports for React, Next.js and any site, linked to what your servers did.",
+  "type": "module",
+  "main": "src/index.js",
+  "module": "src/index.js",
+  "types": "src/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "react": [
+        "src/react.d.ts"
+      ],
+      "next": [
+        "src/next.d.ts"
+      ]
+    }
+  },
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./react": {
+      "types": "./src/react.d.ts",
+      "default": "./src/react.js"
+    },
+    "./next": {
+      "types": "./src/next.d.ts",
+      "default": "./src/next.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "peerDependencies": {
+    "react": ">=17"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "keywords": [
+    "monitoring",
+    "session-replay",
+    "error-tracking",
+    "react",
+    "nextjs",
+    "observability",
+    "browser"
+  ],
+  "homepage": "https://loggerai.uk",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ehisakhile/loggerai-browser.git"
+  },
+  "author": "LoggerAI <dev@loggerai.uk>",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "devDependencies": {
+    "jsdom": "^25.0.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  }
+}
