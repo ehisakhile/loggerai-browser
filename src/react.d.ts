@@ -1,5 +1,6 @@
 import type { Component, ErrorInfo, ReactNode } from "react";
-import type { Options, captureException, report, sessionId, setUser, track } from "./index.js";
+import type { ButtonHTMLAttributes } from "react";
+import type { Options, ReportSheetOptions, captureException, report, sessionId, setUser, showReportSheet, track } from "./index.js";
 
 export interface LoggerAIProviderProps extends Options {
   children?: ReactNode;
@@ -10,6 +11,7 @@ export declare function LoggerAIProvider(props: LoggerAIProviderProps): ReactNod
 
 export declare function useLoggerAI(): {
   report: typeof report;
+  showReportSheet: typeof showReportSheet;
   track: typeof track;
   captureException: typeof captureException;
   setUser: typeof setUser;
@@ -27,4 +29,7 @@ export interface ErrorBoundaryProps {
 
 export declare class ErrorBoundary extends Component<ErrorBoundaryProps, { error: Error | null }> {}
 
-export { captureException, report, track, setUser, sessionId } from "./index.js";
+/** A button that opens "Report a problem". */
+export declare function ReportButton(props: ButtonHTMLAttributes<HTMLButtonElement> & { sheet?: ReportSheetOptions }): ReactNode;
+
+export { captureException, report, showReportSheet, track, setUser, sessionId } from "./index.js";

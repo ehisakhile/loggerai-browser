@@ -2,7 +2,7 @@
 // React: a provider that starts LoggerAI, and an error boundary that sends what broke a part of the page.
 
 import { Component, createElement, Fragment, useEffect } from "react";
-import { captureException, init, report, sessionId, setUser, track } from "./index.js";
+import { captureException, init, report, sessionId, setUser, showReportSheet, track } from "./index.js";
 
 /** Starts LoggerAI once the app is in the browser. Put it near the top of your app. */
 export function LoggerAIProvider({ children, user, ...options }) {
@@ -19,7 +19,7 @@ export function LoggerAIProvider({ children, user, ...options }) {
 
 /** What a component needs to report problems and mark steps. */
 export function useLoggerAI() {
-  return { report, track, captureException, setUser, sessionId };
+  return { report, showReportSheet, track, captureException, setUser, sessionId };
 }
 
 /**
@@ -51,4 +51,9 @@ export class ErrorBoundary extends Component {
   }
 }
 
-export { captureException, report, track, setUser, sessionId };
+/** A button that opens "Report a problem". Style it with className, or pass children for your own label. */
+export function ReportButton({ children = "Report a problem", sheet, ...props }) {
+  return createElement("button", { type: "button", ...props, onClick: () => showReportSheet(sheet) }, children);
+}
+
+export { captureException, report, showReportSheet, track, setUser, sessionId };

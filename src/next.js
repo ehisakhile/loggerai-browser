@@ -21,5 +21,5 @@ export function LoggerAI({ user, ...options }) {
   return null;
 }
 
-export { ErrorBoundary, LoggerAIProvider, useLoggerAI } from "./react.js";
-export { captureException, report, track, setUser, sessionId } from "./index.js";
+export { ErrorBoundary, LoggerAIProvider, ReportButton, useLoggerAI } from "./react.js";
+export { captureException, report, showReportSheet, track, setUser, sessionId } from "./index.js";

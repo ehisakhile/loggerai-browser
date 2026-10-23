@@ -1,6 +1,6 @@
 {
   "name": "@loggerai/browser",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "LoggerAI for web apps: session recording, errors and user reports for React, Next.js and any site, linked to what your servers did.",
   "type": "module",
   "main": "src/index.js",

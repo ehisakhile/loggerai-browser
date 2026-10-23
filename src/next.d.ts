@@ -9,5 +9,5 @@ export interface LoggerAIProps extends Partial<Options> {}
  */
 export declare function LoggerAI(props: LoggerAIProps): ReactNode;
 
-export { ErrorBoundary, LoggerAIProvider, useLoggerAI } from "./react.js";
-export { captureException, report, track, setUser, sessionId } from "./index.js";
+export { ErrorBoundary, LoggerAIProvider, ReportButton, useLoggerAI } from "./react.js";
+export { captureException, report, showReportSheet, track, setUser, sessionId } from "./index.js";

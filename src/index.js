@@ -5,8 +5,10 @@
  * runs until init() is called in a browser.
  */
 import { VERSION } from "./version.js";
+import { mountReportButton, showReportSheet } from "./report-ui.js";
 
 export { VERSION };
+export { canCapture, lrec as encodeRecording, mountReportButton, showReportSheet } from "./report-ui.js";
 export const DEFAULT_ENDPOINT = "https://loggerapp.ehigiator.com/api/v1/ingest/batch";
 
 const MASK = "[REDACTED]";
@@ -209,6 +211,11 @@ export function init(options) {
   instrument(state);
   pageView("page_view");
   state.timer = setInterval(flush, o.flushInterval || 5000);
+  if (o.reportButton) {
+    const mount = () => state && state.undo.push(mountReportButton(o.reportButton === true ? {} : o.reportButton));
+    if (document.body) mount();
+    else document.addEventListener("DOMContentLoaded", mount, { once: true });
+  }
   return true;
 }
 
@@ -358,10 +365,11 @@ export function flush(final = false) {
 // ---- reports ----------------------------------------------------------------------------------------------
 
 /**
- * Sends a problem someone reported, with what they did before it. Pass a screenshot (a Blob, e.g. from
- * html2canvas) if you have one. Resolves to the issue's id on the Issues page.
+ * Sends a problem someone reported, with what they did before it. Screenshots are Blobs (PNG or JPEG);
+ * a recording is the LREC Blob showReportSheet makes. Resolves to the issue's id on the Issues page.
+ * Or use showReportSheet(), which asks for all of this.
  */
-export async function report(note, { screenshot, screenshots = [], contact, extra } = {}) {
+export async function report(note, { screenshot, screenshots = [], recording, contact, extra, onProgress } = {}) {
   if (!state) throw new Error("LoggerAI isn't started: call init() first.");
   if (!String(note || "").trim()) throw new Error("Say what went wrong.");
   push("custom_event", { name: "issue_reported", note: text(note, 2000), url: cleanUrl(location.href) });
@@ -381,12 +389,39 @@ export async function report(note, { screenshot, screenshots = [], contact, extr
     service: state.service,
     ...(extra ? { extra: redact(extra) } : {}),
   }));
-  [screenshot, ...screenshots].filter(Boolean).slice(0, 5).forEach((shot, i) => form.append("screenshot", shot, `screenshot-${i + 1}.png`));
+  [screenshot, ...screenshots].filter(Boolean).slice(0, 5)
+    .forEach((shot, i) => form.append("screenshot", shot, `screenshot-${i + 1}.${shot.type === "image/png" ? "png" : "jpg"}`));
+  if (recording) form.append("recording", recording, "recording.lrec");
   const url = state.reportEndpoint + (state.reportEndpoint.includes("?") ? "&" : "?") + "key=" + encodeURIComponent(state.key);
-  const r = await (origFetch || fetch).call(window, url, { method: "POST", body: form });
-  const body = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(body.detail || `LoggerAI answered ${r.status}`);
+  const { status, body } = onProgress && typeof XMLHttpRequest !== "undefined" ? await upload(url, form, onProgress) : await post(url, form);
+  if (status < 200 || status >= 300) {
+    const detail = body && body.detail;
+    throw new Error(typeof detail === "string" ? detail : status === 0 ? "Couldn't reach LoggerAI. Check your connection." : `LoggerAI answered ${status}`);
+  }
   return body.id;
+}
+
+async function post(url, form) {
+  const r = await (origFetch || fetch).call(window, url, { method: "POST", body: form });
+  return { status: r.status, body: await r.json().catch(() => ({})) };
+}
+
+/** XHR, for the upload's progress (fetch can't report it). Ours, so it isn't recorded as a request. */
+function upload(url, form, onProgress) {
+  return new Promise((resolve) => {
+    const x = new XMLHttpRequest();
+    x.open("POST", url);
+    x.upload.onprogress = (e) => e.lengthComputable && onProgress(e.loaded, e.total);
+    x.onload = () => {
+      let body = {};
+      try {
+        body = JSON.parse(x.responseText || "{}");
+      } catch {}
+      resolve({ status: x.status, body });
+    };
+    x.onerror = () => resolve({ status: 0, body: {} });
+    x.send(form);
+  });
 }
 
 // ---- watching the page ---------------------------------------------------------------------------------------
@@ -549,4 +584,5 @@ function instrument(st) {
   on(window, "pagehide", () => flush(true));
 }
 
-export default { init, close, flush, setUser, track, captureException, report, sessionId, isStarted };
+export default { init, close, flush, setUser, track, captureException, report, showReportSheet, sessionId, isStarted };
+

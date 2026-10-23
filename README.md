@@ -79,6 +79,22 @@ import { init } from "@loggerai/browser"
 init({ publicKey: "pk_live_…", release: "2026.10.1" })
 ```
 
+## Report a problem
+
+A sheet like the Flutter SDK's: what went wrong, an email to reply to, screenshots and a screen recording, sent with the session it happened in. You get an issue (and a Slack message) on the Issues page.
+
+```tsx
+import { ReportButton } from "@loggerai/browser/react"   // or "@loggerai/browser/next"
+
+<ReportButton className="btn">Report a problem</ReportButton>
+```
+
+Or open it from anywhere with `showReportSheet()`, or add a floating button with `init({ …, reportButton: true })`.
+
+**What people type stays private.** While a screenshot or recording is taken, every input, text area, select and editable area is blurred, as is anything you mark with `data-loggerai-mask` (or pass `mask: [".balance"]`). Notes are cleaned of tokens before they're sent. Recordings are two frames a second, at most 90 seconds, in LoggerAI's own format, which the dashboard plays.
+
+Screenshots and recordings use the browser's screen sharing, so people choose to share the tab. Desktop Chrome, Edge, Firefox and Safari support it. Phone browsers don't, and there the sheet sends the note on its own, unless you pass `captureScreenshot` (e.g. with html2canvas).
+
 ## Users, steps and reports
 
 ```js
@@ -88,7 +104,7 @@ setUser(user.id)                           // their sessions and reports can be 
 track("checkout_started", { items: 3 })    // a step of your own in the session's timeline
 captureException(err, { orderId })         // an error you caught
 
-// "Report a problem": the note, the session it happened in and, if you have one, a screenshot.
+// Your own "Report a problem" form: the note, the session it happened in and, if you have one, a screenshot.
 const issueId = await report("The pay button does nothing", { contact: "ada@example.com", screenshot: blob })
 ```
 
@@ -107,6 +123,7 @@ In React, `useLoggerAI()` gives you the same functions.
 | `captureConsole` | Record `console.error` and `console.warn`. Default `true`. |
 | `beforeSend(event)` | Change an event, or return `null` to drop it. |
 | `enabled` | `false` turns it off, e.g. in development. |
+| `reportButton` | `true` (or `{ label, position }`) adds a floating "Report a problem" button. |
 
 Server-side rendering is safe: nothing runs until the code is in the browser, and calling `init` twice (React's development double effects) does nothing. On a page that already has the Laravel package's script, it leaves recording to that script.
 
