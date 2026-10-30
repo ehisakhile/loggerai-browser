@@ -110,6 +110,17 @@ const issueId = await report("The pay button does nothing", { contact: "ada@exam
 
 In React, `useLoggerAI()` gives you the same functions.
 
+## Session replay
+
+`replay: true` records the page as people see it, so you can watch a session on the Sessions page, while it's happening or afterwards, next to its clicks, requests and errors.
+
+```jsx
+<LoggerAI replay />                                   // Next.js
+init({ publicKey, replay: { sampleRate: 0.2 } })      // a fifth of sessions
+```
+
+Private by default: everything typed is masked, passwords included. Add `data-loggerai-mask` to an element to mask its text too, or `data-loggerai-block` to leave it out entirely. `replay: { maskAllText: true }` masks all text on the page. Recording uses [rrweb](https://github.com/rrweb-io/rrweb) (MIT), loaded only when replay is on.
+
 ## Options
 
 | Option | |
@@ -123,6 +134,7 @@ In React, `useLoggerAI()` gives you the same functions.
 | `captureConsole` | Record `console.error` and `console.warn`. Default `true`. |
 | `beforeSend(event)` | Change an event, or return `null` to drop it. |
 | `enabled` | `false` turns it off, e.g. in development. |
+| `replay` | `true` (or `{ sampleRate, maskAllText, mask, block }`) records the page for session replay. |
 | `reportButton` | `true` (or `{ label, position }`) adds a floating "Report a problem" button. |
 
 Server-side rendering is safe: nothing runs until the code is in the browser, and calling `init` twice (React's development double effects) does nothing. On a page that already has the Laravel package's script, it leaves recording to that script.

@@ -28,10 +28,24 @@ export interface Options {
   flushInterval?: number;
   /** False turns it off, e.g. in development. */
   enabled?: boolean;
+  /** Session replay: record the page as people see it, to watch on the Sessions page (live, or later). Typed text is
+   * always masked; true, or options. Loads rrweb on demand. */
+  replay?: boolean | ReplayOptions;
   /** Show a floating "Report a problem" button (true, or its options). */
   reportButton?: boolean | ReportButtonOptions;
   endpoint?: string;
   reportEndpoint?: string;
+}
+
+export interface ReplayOptions {
+  /** Share of sessions to replay, 0 to 1. Default 1 (all). */
+  sampleRate?: number;
+  /** Mask all text on the page, not just what's typed. Default false. */
+  maskAllText?: boolean;
+  /** More CSS selectors whose text is masked (data-loggerai-mask always is). */
+  mask?: string[];
+  /** CSS selectors left out of the replay entirely (data-loggerai-block always is). */
+  block?: string[];
 }
 
 export interface ReportOptions {

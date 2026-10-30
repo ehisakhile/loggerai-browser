@@ -211,6 +211,16 @@ export function init(options) {
   instrument(state);
   pageView("page_view");
   state.timer = setInterval(flush, o.flushInterval || 5000);
+  if (o.replay) {
+    // Loaded on demand: apps without replay never download rrweb.
+    const st = state;
+    import("./replay.js")
+      .then((m) => {
+        if (state !== st) return; // closed meanwhile
+        st.undo.push(m.startReplay({ sessionId: st.sessionId, endpoint: st.endpoint, key: st.key, send: origFetch || fetch }, o.replay === true ? {} : o.replay));
+      })
+      .catch((e) => console.warn("LoggerAI: session replay couldn't start", e));
+  }
   if (o.reportButton) {
     const mount = () => state && state.undo.push(mountReportButton(o.reportButton === true ? {} : o.reportButton));
     if (document.body) mount();
