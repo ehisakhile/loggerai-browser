@@ -8,7 +8,7 @@
 
 import { record } from "@rrweb/record";
 
-const CHUNK_MS = 10_000; // send at least this often while something happens
+const CHUNK_MS = 5_000; // send at least this often while something happens (how far behind "live" is)
 const CHUNK_BYTES = 400_000;
 const BEACON_BYTES = 60_000;
 const MAX_CHUNKS = 3000; // the server's cap per session
